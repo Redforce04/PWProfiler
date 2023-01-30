@@ -102,7 +102,7 @@
       script: 
       - 'dotnet publish -c Release --no-restore'
 
-      - 'mv PWProfiler/bin/Release/PwProfiler.dll PwProfiler.dll'
+      - 'mv PWProfiler/bin/Release/PWProfiler.dll PWProfiler.dll'
       artifacts:
         name: "Build Results"
         paths: 

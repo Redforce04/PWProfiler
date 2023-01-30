@@ -39,9 +39,6 @@
         <Reference Include="Assembly-CSharp-firstpass">
           <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
-        <Reference Include="dotMemory.Unit, Version=111.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-          <HintPath>..\packages\JetBrains.dotMemoryUnit.3.2.20220510\lib\net35\dotMemory.Unit.dll</HintPath>
-        </Reference>
         <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
           <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.3.1\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
         </Reference>
@@ -100,6 +97,7 @@
         <Compile Include="TimingMonoBehaviour.cs" />
     </ItemGroup>
     <ItemGroup>
+      <None Include="App.config" />
       <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>

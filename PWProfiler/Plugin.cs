@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using JetBrains.dotMemoryUnit;
-using JetBrains.dotMemoryUnit.Kernel;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
@@ -19,10 +17,9 @@ namespace PWProfiler
     public class PwProfiler 
     {
         private const float StatsMeasuringDelay = 5f;
-        private const bool CompareToLastMemoryCheckpoint = false;
         internal float ProblematicFPS = 30;
-        private bool CheckMemory = false;
-        private bool CheckCPU = false;
+        private bool CheckMemory = true;
+        private bool CheckCPU = true;
         private bool NetdataLogging = true;
         private string NetDataLogLocation = Path.GetTempPath() + "PwProfiler/";
         private string NetDataLog => NetDataLogLocation + $"Server-{ServerStatic.ServerPort}";
@@ -69,25 +66,12 @@ namespace PWProfiler
             Log.Info($"Logging Stats to {_logLocations[LoggingFile.Stats]}");
             if(NetdataLogging)
                 Log.Info($"NetData Logging. NetData Log Location: \'{NetDataLogLocation}\'");
-            foreach (string directory in Directory.GetDirectories(Path.GetTempPath()))
-            {
-                Log.Debug($"Temp Directory: {directory}");
-            }
-            foreach (string file in Directory.GetFiles(Path.GetTempPath()))
-            {
-                Log.Debug($"Temp File: {file}");
-            }
             CurrentProcess = Process.GetCurrentProcess();
             cpuCounter = new PerformanceCounter();
             cpuCounter.CategoryName = "Processor";
             cpuCounter.CounterName = "% Processor Time";
             cpuCounter.InstanceName = "_Total";
             
-            if (!dotMemoryApi.IsEnabled)
-            {
-                CheckMemory = false;   
-                Log.Error($"Dot Memory is not Enabled! Memory stats will not be available.");
-            }
             
             Singleton = this;
             _timingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>();
@@ -96,8 +80,7 @@ namespace PWProfiler
 
                 //obj.AddComponent<TimingMonoBehaviour>();
             Timing.RunCoroutine(PerformanceMeasuringCoroutine());
-            if(CompareToLastMemoryCheckpoint && CheckMemory)
-                _checkpoint = dotMemory.Check();
+            
 
         }
         private IEnumerator<float> PerformanceMeasuringCoroutine()
@@ -119,25 +102,12 @@ namespace PWProfiler
             }
         }
 
-        private MemoryCheckPoint _checkpoint;
         private void LogStats()
         {
             long allocatedMemory = -1;
-            allocatedMemory = CurrentProcess.WorkingSet64;
             if (CheckMemory)
             {
-
-                _checkpoint = dotMemory.Check(memory =>
-                {
-                    if (CompareToLastMemoryCheckpoint)
-                    {
-                        var newObjects = memory.GetDifference(_checkpoint).GetNewObjects();
-                        var createdObjectsCount = newObjects.ObjectsCount;
-                        allocatedMemory = newObjects.SizeInBytes;
-                    }
-                    else
-                        allocatedMemory = memory.SizeInBytes;
-                });
+                allocatedMemory = CurrentProcess.WorkingSet64;
             }
 
             float cpuUsage = cpuCounter.NextValue();

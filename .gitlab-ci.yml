@@ -101,14 +101,10 @@
       # Only one project path can be passed as a parameter to 'dotnet build' command.
       script: 
       - 'dotnet publish -c Release --no-restore'
-      - ls
-      - ls PWProfiler
-      - ls PWProfiler/bin
-      - ls PWProfiler/bin/Release
-      - 'mv PWProfiler/bin/Release/PWProfiler.dll PWProfiler.dll'
+      - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
       artifacts:
         name: "Build Results"
         paths: 
-          - PwProfiler.dll
+          - PWProfiler.dll
       
     

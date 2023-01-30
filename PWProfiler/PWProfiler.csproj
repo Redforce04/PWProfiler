@@ -39,6 +39,9 @@
         <Reference Include="Assembly-CSharp-firstpass">
           <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
+        <Reference Include="CommandSystem.Core">
+          <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\CommandSystem.Core.dll</HintPath>
+        </Reference>
         <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
           <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.3.1\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
         </Reference>
@@ -49,6 +52,9 @@
           <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Mirror-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib" />
+        <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+          <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+        </Reference>
         <Reference Include="NwPluginAPI.Analyzers, Version=12.0.0.0, Culture=neutral, processorArchitecture=Amd64">
           <HintPath>..\packages\Northwood.PluginAPI.Analyzers.12.0.0\lib\netstandard2.0\NwPluginAPI.Analyzers.dll</HintPath>
         </Reference>
@@ -92,8 +98,17 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Commands\LastProfileCommand.cs" />
+        <Compile Include="Commands\TpsCommand.cs" />
+        <Compile Include="Configs\Config.cs" />
+        <Compile Include="Enums\LoggingFile.cs" />
+        <Compile Include="LoggingSystem.cs" />
+        <Compile Include="NetDataIntegration.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Structs\LoggingInfo.cs" />
+        <Compile Include="Structs\LowTps.cs" />
+        <Compile Include="Structs\NetDataPacket.cs" />
         <Compile Include="TimingMonoBehaviour.cs" />
     </ItemGroup>
     <ItemGroup>

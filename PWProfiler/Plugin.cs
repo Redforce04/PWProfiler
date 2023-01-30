@@ -1,98 +1,126 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using MEC;
 using Mirror.LiteNetLib4Mirror;
-using UnityEngine;
+using PWProfiler.Configs;
+using PWProfiler.Structs;
 using Object = UnityEngine.Object;
 
 namespace PWProfiler
 {
     
-    public class PwProfiler 
+    // ReSharper disable once ClassNeverInstantiated.Global
+    // ReSharper disable once InconsistentNaming
+    public class PWProfiler
     {
-        private const float StatsMeasuringDelay = 5f;
-        internal float ProblematicFPS = 30;
-        private bool CheckMemory = true;
-        private bool CheckCPU = true;
-        private bool NetdataLogging = true;
-        private string NetDataLogLocation = Path.GetTempPath() + "PwProfiler/";
-        private string NetDataLog => NetDataLogLocation + $"Server-{ServerStatic.ServerPort}";
+        /// <summary>
+        /// Main plugin instance.
+        /// </summary>
+        public static PWProfiler Singleton { get; private set; }
         
-        public static PwProfiler Singleton { get; private set; }
-        private TimingMonoBehaviour _timingMonoBehaviour;
-        private static Dictionary<LoggingFile, string> _logLocations;
-        private Process CurrentProcess;
-        private PerformanceCounter cpuCounter;
+        /// <summary>
+        /// Main Plugin Config
+        /// </summary>
+        [PluginConfig]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public MainConfig Config;
+        
+        /// <summary>
+        /// Gets the Epoch
+        /// </summary>
+        private long Epoch => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        
+        /// <summary>
+        /// The instance of TimingMonoBehaviour
+        /// </summary>
+        internal TimingMonoBehaviour TimingMonoBehaviour;
+        
+        /// <summary>
+        /// Process information for cpu stats.
+        /// </summary>
+        private Process _currentProcess;
+        
+        /// <summary>
+        /// Performance Counter for cpu stats.
+        /// </summary>
+        private PerformanceCounter _cpuCounter;
+        
+        
+        /// <summary>
+        /// Main Plugin Load Point
+        /// </summary>
         [PluginPriority(LoadPriority.Highest)]
         [PluginEntryPoint("PWProfiler", "1.0.0", "A plugin to log profiling information.", "Redforce04#4091")]
+        // ReSharper disable once ArrangeTypeMemberModifiers
+        // ReSharper disable once UnusedMember.Local
         void LoadPlugin()
         {
-            ProblematicFPS = 1 / ProblematicFPS;
-
-            var handler = PluginHandler.Get(this);
-
-            string path = handler.MainConfigPath.Replace("config.yml", "");
-            _logLocations= new Dictionary<LoggingFile, string>()
+            if (Config.Enabled)
             {
-                { LoggingFile.Stats, $"{path}Stats/" },
-                { LoggingFile.LowFPS, $"{path}LowFPS/" }
-            };
-            foreach (string directory in _logLocations.Values)
-            {
-                try
-                {
-                    if (!Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-                }
-                catch(Exception e)
-                {
-                    Log.Error($"Could not create directory '{directory}'\n{e}");
-                }
+                Log.Warning($"PWProfiler is not enabled by config. It will not load.");
+                return;
             }
-
-            if (NetdataLogging && !Directory.Exists(NetDataLogLocation))
-                Directory.CreateDirectory(NetDataLogLocation);
-            if (NetdataLogging && !File.Exists(NetDataLog))
-                File.Create(NetDataLog);
-            
-            Log.Info($"Logging Stats to {_logLocations[LoggingFile.Stats]}");
-            if(NetdataLogging)
-                Log.Info($"NetData Logging. NetData Log Location: \'{NetDataLogLocation}\'");
-            CurrentProcess = Process.GetCurrentProcess();
-            cpuCounter = new PerformanceCounter();
-            cpuCounter.CategoryName = "Processor";
-            cpuCounter.CounterName = "% Processor Time";
-            cpuCounter.InstanceName = "_Total";
-            
-            
             Singleton = this;
-            _timingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>();
-            if(_timingMonoBehaviour is null)
-                _timingMonoBehaviour =  LiteNetLib4MirrorNetworkManager.singleton.gameObject.AddComponent<TimingMonoBehaviour>();
-
-                //obj.AddComponent<TimingMonoBehaviour>();
-            Timing.RunCoroutine(PerformanceMeasuringCoroutine());
             
+            // Plugin checks delta time so we need to convert the tps to a delta time.
+            Config.LowTps /= 1;
+            
+            // Start the NetDataIntegration
+            if (Config.NetDataIntegrationEnabled)
+            {
+                var unused = new NetDataIntegration();
+            }
+            
+            // Start the Logging System
+            if (Config.FileLoggingEnabled)
+            {
+                var unused = new LoggingSystem();
+            }
+            
+            // Initializes the information to track cpu usage.
+            if(Config.CheckCpu)
+                _initCpuInfo();
+            
+            // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
+            TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ?? LiteNetLib4MirrorNetworkManager.singleton.gameObject.AddComponent<TimingMonoBehaviour>();
+            
+            // Starts the main coroutine for checking stats.
+            Timing.RunCoroutine(PerformanceMeasuringCoroutine());
+        }
+        
+        
+
+        /// <summary>
+        /// Initializes the information to track cpu usage.
+        /// </summary>
+        private void _initCpuInfo()
+        {
+            _currentProcess = Process.GetCurrentProcess();
+            _cpuCounter = new PerformanceCounter();
+            _cpuCounter.CategoryName = "Processor";
+            _cpuCounter.CounterName = "% Processor Time";
+            _cpuCounter.InstanceName = "_Total";
 
         }
+        
+        
+        /// <summary>
+        /// The coroutine that collects data at the supplied refresh <see cref="Configs"/>.<see cref="Configs.MainConfig.StatsRefreshTime"/>
+        /// </summary>
         private IEnumerator<float> PerformanceMeasuringCoroutine()
         {
             for (;;) //repeat the following infinitely
             {
-                yield return Timing.WaitForSeconds(StatsMeasuringDelay);
+                yield return Timing.WaitForSeconds(Config.StatsRefreshTime);
                 try
                 {
-                    if (_timingMonoBehaviour == null) 
-                        _timingMonoBehaviour =  LiteNetLib4MirrorNetworkManager.singleton.gameObject.AddComponent<TimingMonoBehaviour>(); 
-                    LogStats();
+                    if (TimingMonoBehaviour == null) 
+                        TimingMonoBehaviour =  LiteNetLib4MirrorNetworkManager.singleton.gameObject.AddComponent<TimingMonoBehaviour>(); 
+                    _logStats();
                 }
                 catch (Exception e)
                 {
@@ -100,133 +128,72 @@ namespace PWProfiler
                 }
                 
             }
+            // ReSharper disable once IteratorNeverReturns
         }
-
-        private void LogStats()
+        
+        /// <summary>
+        /// The method that collects the stats and logs them.
+        /// </summary>
+        private void _logStats()
         {
-            long allocatedMemory = -1;
-            if (CheckMemory)
-            {
-                allocatedMemory = CurrentProcess.WorkingSet64;
-            }
-
-            float cpuUsage = cpuCounter.NextValue();
+            // Check memory usage if enabled.
+            long allocatedMemory  = Config.CheckMemory ? _currentProcess.WorkingSet64 : -1;
+            
+            // Check CPU Usage if enabled.
+            float cpuUsage = Config.CheckCpu ? _cpuCounter.NextValue() : -1;
+            
+            // Create the struct object.
             LoggingInfo loggingInfo = new LoggingInfo()
             {
                 DateTime = DateTime.UtcNow,
-                Epoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                AverageFPS = 1/_timingMonoBehaviour.AverageDeltaTime,
-                AverageDeltaTime = _timingMonoBehaviour.AverageDeltaTime,
+                Epoch = Epoch,
+                AverageTps = 1/TimingMonoBehaviour.AverageDeltaTime,
+                AverageDeltaTime = TimingMonoBehaviour.AverageDeltaTime,
                 MemoryUsage = allocatedMemory/1000000,
                 CpuUsage = cpuUsage,
                 Players = Server.PlayerCount
             };
-            LogStatsToFile(loggingInfo);
-            if (_timingMonoBehaviour.SlowDeltaTime.Count > 0)
+            
+            // if file logging is enabled, log stats to file.
+            if(Config.FileLoggingEnabled)
+                LoggingSystem.Singleton.LogStatsToFile(loggingInfo);
+            
+            // if there have been instances of low tps, log them
+            if (TimingMonoBehaviour.SlowDeltaTime.Count > 0)
             {
-                List<LowFPS> fpsInstances = new List<LowFPS>();
-                for (int i = 0; i < _timingMonoBehaviour.SlowDeltaTime.Count; i++)
+                // get instances of low tps and log them.
+                List<LowTps> tpsInstances = new List<LowTps>();
+                for (int i = 0; i < TimingMonoBehaviour.SlowDeltaTime.Count; i++)
                 {
-                    var fps = _timingMonoBehaviour.SlowDeltaTime[i];
-                    LowFPS lowFPS = new LowFPS()
+                    var tps = TimingMonoBehaviour.SlowDeltaTime[i];
+                    LowTps lowTps = new LowTps()
                     {
                         DateTime = DateTime.Now,
-                        Epoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                        FPS = 1/fps,
-                        DeltaTime = fps,
+                        Epoch = Epoch,
+                        Tps = 1/tps,
+                        DeltaTime = tps,
                         InstanceNumber = i,
                         Players = Server.PlayerCount
                     };
-                    fpsInstances.Add(lowFPS);
+                    tpsInstances.Add(lowTps);
                 }
-
-                LOGLowFPSInstances(fpsInstances);
-                _timingMonoBehaviour.SlowDeltaTime.Clear();
+                
+                // if file logging is enabled, log the low tps instances
+                if(Config.FileLoggingEnabled)
+                    LoggingSystem.LogLowTpsInstances(tpsInstances);
+                
+                // if the NetData integration is enabled send the stats to it to process
+                if(Config.NetDataIntegrationEnabled)
+                    NetDataIntegration.Singleton.SendLowTpsToNetDataIntegration(loggingInfo, tpsInstances.Count);
+                
+                // make sure to clear the instances of low tps
+                TimingMonoBehaviour.SlowDeltaTime.Clear();
             }
+            // in case there were no stats, trigger NetData integration again
+            else if (Config.NetDataIntegrationEnabled)
+                NetDataIntegration.Singleton.SendLowTpsToNetDataIntegration(loggingInfo, 0);
+
         }
 
-        private void LOGLowFPSInstances(List<LowFPS> fpsInstances)
-        {
-            string combined = "";
-            foreach (LowFPS fps in fpsInstances)
-                combined += $"lowfps = {fps.DateTime} = {fps.Epoch} = {fps.InstanceNumber} = {fps.FPS} = {fps.DeltaTime} = {fps.Players}\n";
-            combined += $"# Refresh, server caught back up. \n";
-            
-            DateTime date = DateTime.Now;
-            string path = _logLocations[LoggingFile.LowFPS] + $"LowFPS-{date.Month}-{date.Day}-{date.Year}.txt";
-            if (!File.Exists(path))
-            {
-                File.Create(path).Close();
-                File.AppendAllText(path, $"# Local Time = Epoch Time = Instance Number = FPS = Delta Time\n");
-            }
-            File.AppendAllText(path, combined);
-
-
-            if (Singleton.NetdataLogging)
-            {
-                if (NetdataLogging)
-                {
-                    using (FileStream fs = new FileStream(NetDataLog, FileMode.Append, FileAccess.Write, FileShare.Write))
-                    {
-                        StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-                        sw.Write($"refresh = {StatsMeasuringDelay}\n");
-                        sw.Write(combined);
-                        sw.Close();
-                        fs.Close();
-                    }
-                }
-            }
-        }
-
-        private void LogStatsToFile(LoggingInfo log)
-        {
-            DateTime date = DateTime.Now;
-            string path = _logLocations[LoggingFile.Stats] + $"Stats-{date.Month}-{date.Day}-{date.Year}.txt";
-            if (!File.Exists(path))
-            {
-                File.Create(path).Close();
-                File.AppendAllText(path, $"# Local Time = Epoch Time = Average FPS = Average Delta Time = Memory Usage = Cpu Usage\n");
-            }
-
-            string stats =
-                $"stats = {log.DateTime.ToLocalTime()} = {log.Epoch} = {log.AverageFPS} = {log.AverageDeltaTime} = {log.MemoryUsage} = {log.CpuUsage} = {log.Players}\n";
-            File.AppendAllText(path, stats);
-            if (NetdataLogging)
-            {
-                using (FileStream fs = new FileStream(NetDataLog, FileMode.Truncate, FileAccess.Write, FileShare.Write))
-                {
-                    StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-                    sw.Write(stats);
-                    sw.Close();
-                    fs.Close();
-                }
-            }
-        }
-
-        enum LoggingFile
-        {
-            Stats,
-            LowFPS
-        }
-
-        struct LowFPS
-        {
-            internal DateTime DateTime;
-            internal long Epoch;
-            internal int InstanceNumber;
-            internal float FPS;
-            internal float DeltaTime;
-            internal int Players;
-        }
-        struct LoggingInfo
-        {
-            internal DateTime DateTime;
-            internal long Epoch;
-            internal float AverageFPS;
-            internal float AverageDeltaTime;
-            internal long MemoryUsage;
-            internal float CpuUsage;
-            internal int Players;
-        }
     }
 }

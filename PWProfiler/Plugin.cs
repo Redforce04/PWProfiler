@@ -25,9 +25,9 @@ namespace PWProfiler
         /// <summary>
         /// Main Plugin Config
         /// </summary>
-        [PluginConfig]
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        public MainConfig Config;
+        [PluginConfig]
+        public MainConfig Config = new MainConfig();
         
         /// <summary>
         /// Gets the Epoch
@@ -53,12 +53,17 @@ namespace PWProfiler
         /// <summary>
         /// Main Plugin Load Point
         /// </summary>
-        [PluginPriority(LoadPriority.Highest)]
+        //[PluginPriority(LoadPriority.Highest)]
         [PluginEntryPoint("PWProfiler", "1.0.0", "A plugin to log profiling information.", "Redforce04#4091")]
-        // ReSharper disable once ArrangeTypeMemberModifiers
-        // ReSharper disable once UnusedMember.Local
         void LoadPlugin()
         {
+            Log.Info($"PWProfiler Loading.");
+            if (Config is null)
+            {
+                var handler = PluginHandler.Get(this);
+                PluginConfig conf = new PluginConfig();
+                handler.LoadConfig(this,nameof(MainConfig));
+            }
             if (Config.Enabled)
             {
                 Log.Warning($"PWProfiler is not enabled by config. It will not load.");
@@ -72,24 +77,36 @@ namespace PWProfiler
             // Start the NetDataIntegration
             if (Config.NetDataIntegrationEnabled)
             {
+                Log.Debug($"Starting Netdata Integration", Config.Debug);
                 var unused = new NetDataIntegration();
             }
             
             // Start the Logging System
             if (Config.FileLoggingEnabled)
             {
+                Log.Debug($"Starting Logging System", Config.Debug);
                 var unused = new LoggingSystem();
             }
             
             // Initializes the information to track cpu usage.
-            if(Config.CheckCpu)
+            if (Config.CheckCpu)
+            {
+                Log.Debug($"Initializing Cpu Stats", Config.Debug);
                 _initCpuInfo();
-            
-            // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
-            TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ?? LiteNetLib4MirrorNetworkManager.singleton.gameObject.AddComponent<TimingMonoBehaviour>();
-            
-            // Starts the main coroutine for checking stats.
-            Timing.RunCoroutine(PerformanceMeasuringCoroutine());
+            }
+
+            Timing.CallDelayed(5f, () =>
+            {
+
+                // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
+                Log.Debug($"Creating Timing MonoBehaviour", Config.Debug);
+                TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ?? LiteNetLib4MirrorNetworkManager
+                    .singleton.gameObject.AddComponent<TimingMonoBehaviour>();
+
+                // Starts the main coroutine for checking stats.
+                Log.Debug($"Beginning Performance Measuring Coroutine", Config.Debug);
+                Timing.RunCoroutine(PerformanceMeasuringCoroutine());
+            });
         }
         
         

@@ -102,9 +102,12 @@
       script: 
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
+      - 'mkdir dependencies'
+      - 'mv PWProfiler/bin/Debug/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
       artifacts:
         name: "Build Results"
         paths: 
           - PWProfiler.dll
+          - dependencies/Newtonsoft.Json.dll
       
     

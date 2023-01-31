@@ -16,6 +16,11 @@ namespace PWProfiler.Configs
         /// Whether the plugin is enabled or not.
         /// </summary>
         public bool Enabled { get; set; } = true;
+
+        /// <summary>
+        /// Whether debug mod is disabled or not.
+        /// </summary>
+        public bool Debug { get; set; } = false;
         
         /// <summary>
         /// Whether the plugin will check memory stats.

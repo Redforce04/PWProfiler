@@ -1,7 +1,6 @@
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\PWProfiler.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\PWProfiler.pdb
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Assembly-CSharp-firstpass.dll
-C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\dotMemory.Unit.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.CodeAnalysis.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\NwPluginAPI.Analyzers.dll
@@ -27,7 +26,6 @@ C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.InputLe
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.IMGUIModule.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.SharedInternalsModule.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.TextRenderingModule.dll
-C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\dotMemory.Unit.xml
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.CodeAnalysis.pdb
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.CodeAnalysis.xml
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.CodeAnalysis.CSharp.pdb
@@ -123,3 +121,6 @@ C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.Vehicle
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.WindModule.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.XRModule.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.InputModule.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\PWProfiler.dll.config
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Newtonsoft.Json.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Newtonsoft.Json.xml

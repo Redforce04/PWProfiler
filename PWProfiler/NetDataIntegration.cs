@@ -83,7 +83,7 @@ namespace PWProfiler
         /// </summary>
         /// <param name="log"></param>
         /// <param name="lowTps"></param>
-        internal void SendLowTpsToNetDataIntegration(LoggingInfo log, int lowTps)
+        internal void SendInfoToNetDataIntegration(LoggingInfo log, int lowTps)
         {
             NetDataPacket packet = new NetDataPacket()
             {

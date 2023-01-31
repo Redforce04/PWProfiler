@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
-using PluginAPI.Enums;
 using MEC;
 using Mirror.LiteNetLib4Mirror;
 using PWProfiler.Configs;
@@ -21,13 +20,13 @@ namespace PWProfiler
         /// Main plugin instance.
         /// </summary>
         public static PWProfiler Singleton { get; private set; }
-        
+
         /// <summary>
         /// Main Plugin Config
         /// </summary>
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
-        [PluginConfig]
-        public MainConfig Config = new MainConfig();
+        // ReSharper disable once UnassignedField.Global
+        [PluginConfig] public MainConfig Config;
         
         /// <summary>
         /// Gets the Epoch
@@ -55,16 +54,17 @@ namespace PWProfiler
         /// </summary>
         //[PluginPriority(LoadPriority.Highest)]
         [PluginEntryPoint("PWProfiler", "1.0.0", "A plugin to log profiling information.", "Redforce04#4091")]
+        // ReSharper disable once ArrangeTypeMemberModifiers
+        // ReSharper disable once UnusedMember.Local
         void LoadPlugin()
         {
             Log.Info($"PWProfiler Loading.");
             if (Config is null)
             {
                 var handler = PluginHandler.Get(this);
-                PluginConfig conf = new PluginConfig();
                 handler.LoadConfig(this,nameof(MainConfig));
             }
-            if (Config.Enabled)
+            if (Config == null || !Config.Enabled)
             {
                 Log.Warning($"PWProfiler is not enabled by config. It will not load.");
                 return;
@@ -173,7 +173,7 @@ namespace PWProfiler
             
             // if file logging is enabled, log stats to file.
             if(Config.FileLoggingEnabled)
-                LoggingSystem.Singleton.LogStatsToFile(loggingInfo);
+                LoggingSystem.LogStatsToFile(loggingInfo);
             
             // if there have been instances of low tps, log them
             if (TimingMonoBehaviour.SlowDeltaTime.Count > 0)
@@ -201,14 +201,15 @@ namespace PWProfiler
                 
                 // if the NetData integration is enabled send the stats to it to process
                 if(Config.NetDataIntegrationEnabled)
-                    NetDataIntegration.Singleton.SendLowTpsToNetDataIntegration(loggingInfo, tpsInstances.Count);
+                    NetDataIntegration.Singleton.SendInfoToNetDataIntegration(loggingInfo, tpsInstances.Count);
                 
                 // make sure to clear the instances of low tps
                 TimingMonoBehaviour.SlowDeltaTime.Clear();
             }
             // in case there were no stats, trigger NetData integration again
             else if (Config.NetDataIntegrationEnabled)
-                NetDataIntegration.Singleton.SendLowTpsToNetDataIntegration(loggingInfo, 0);
+                NetDataIntegration.Singleton.SendInfoToNetDataIntegration(loggingInfo, 0);
+
 
         }
 

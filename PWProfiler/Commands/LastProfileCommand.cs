@@ -16,14 +16,12 @@ namespace PWProfiler.Commands
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
 
-    public class LastProfileCommand : ICommand, IUsageProvider
+    public class LastProfileCommand : ICommand
     {
         // ReSharper disable once StringLiteralTypo
         public string Command { get; } = "lastprofile";
         
         public string[] Aliases { get; } = new[] { "profile" };
-
-        public string[] Usage { get; } = new string[] { };
 
         public string Description { get; } = $"Gets the last profile taken.";
         

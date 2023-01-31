@@ -11,7 +11,7 @@ using System;
 
 namespace PWProfiler.Structs
 {
-    struct LowTps
+    public struct LowTps
     {
         internal DateTime DateTime;
         internal long Epoch;

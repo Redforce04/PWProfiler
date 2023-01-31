@@ -11,7 +11,7 @@ using System;
 
 namespace PWProfiler.Structs
 {
-    struct LoggingInfo
+    public struct LoggingInfo
     {
         internal DateTime DateTime;
         internal long Epoch;

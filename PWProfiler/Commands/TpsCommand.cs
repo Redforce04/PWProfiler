@@ -15,7 +15,7 @@ namespace PWProfiler.Commands
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
 
-    public class TpsCommand : ICommand, IUsageProvider
+    public class TpsCommand : ICommand
     {
         // ReSharper disable once StringLiteralTypo
         public string Command { get; } = "tickspeed";
@@ -23,11 +23,18 @@ namespace PWProfiler.Commands
         // ReSharper disable once StringLiteralTypo
         public string[] Aliases { get; } = new[] { "tps", "deltatime", "fps" };
 
-        public string[] Usage { get; } = new string[] { };
-
-        public string Description { get; } = $"Gets the average tps over the last {PWProfiler.Singleton.Config.AverageFrameSampleAmount} frames.";
-
-        private static float GetAverageDeltaTime => PWProfiler.Singleton.TimingMonoBehaviour.AverageDeltaTime;
+        public string Description
+        {
+            get
+            {
+                if (PWProfiler.Singleton is null || PWProfiler.Singleton.Config is null)
+                    return $"Gets the average tps over the last 120 frames.";
+                else
+                    return $"Gets the average tps over the last {PWProfiler.Singleton.Config.AverageFrameSampleAmount} frames.";
+            }
+        }
+        
+        private float GetAverageDeltaTime => PWProfiler.Singleton.TimingMonoBehaviour.AverageDeltaTime;
         
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

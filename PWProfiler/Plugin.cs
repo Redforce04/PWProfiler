@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using MEC;
 using Mirror.LiteNetLib4Mirror;
 using PWProfiler.Configs;
 using PWProfiler.Structs;
+using Sentry;
 using Object = UnityEngine.Object;
 
 namespace PWProfiler
@@ -58,58 +62,114 @@ namespace PWProfiler
         // ReSharper disable once UnusedMember.Local
         void LoadPlugin()
         {
-            Log.Info($"PWProfiler Loading.");
-            if (Config is null)
+            _getVersionInstances();
+
+            using (SentrySdk.Init(o =>
+                   {
+                       o.Dsn = "https://d274762b2b284900950ef5a34344d503@sentry.peanutworshipers.net/3";
+                       // When configuring for the first time, to see what the SDK is doing:
+                       o.Debug = true;
+                       o.Release = GitCommitHash;
+                       o.AutoSessionTracking = true;
+                       // Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
+                       // We recommend adjusting this value in production.
+                       o.TracesSampleRate = 1.0;
+                       // Enable Global Mode if running in a client app
+                       o.IsGlobalModeEnabled = true;
+                   }))
             {
-                var handler = PluginHandler.Get(this);
-                handler.LoadConfig(this,nameof(MainConfig));
+                // App code goes here. Dispose the SDK before exiting to flush events.
+
+                Log.Info($"PWProfiler Loading.");
+                if (Config is null)
+                {
+                    var handler = PluginHandler.Get(this);
+                    handler.LoadConfig(this, nameof(MainConfig));
+                }
+
+                if (Config == null || !Config.Enabled)
+                {
+                    Log.Warning($"PWProfiler is not enabled by config. It will not load.");
+                    return;
+                }
+
+                Singleton = this;
+                // Plugin checks delta time so we need to convert the tps to a delta time.
+                Config.LowTps /= 1;
+
+                // Start the NetDataIntegration
+                if (Config.NetDataIntegrationEnabled)
+                {
+                    Log.Debug($"Starting Netdata Integration", Config.Debug);
+                    var unused = new NetDataIntegration();
+                }
+
+                // Start the Logging System
+                if (Config.FileLoggingEnabled)
+                {
+                    Log.Debug($"Starting Logging System", Config.Debug);
+                    var unused = new LoggingSystem();
+                }
+
+                // Initializes the information to track cpu usage.
+                if (Config.CheckCpu)
+                {
+                    Log.Debug($"Initializing Cpu Stats", Config.Debug);
+                    _initCpuInfo();
+                }
+
+                Timing.CallDelayed(5f, () =>
+                {
+
+                    // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
+                    Log.Debug($"Creating Timing MonoBehaviour", Config.Debug);
+                    TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ??
+                                          LiteNetLib4MirrorNetworkManager
+                                              .singleton.gameObject.AddComponent<TimingMonoBehaviour>();
+
+                    // Starts the main coroutine for checking stats.
+                    Log.Debug($"Beginning Performance Measuring Coroutine", Config.Debug);
+                    Timing.RunCoroutine(PerformanceMeasuringCoroutine());
+                });
             }
-            if (Config == null || !Config.Enabled)
+        }
+
+        /// <summary>
+        /// Gets information about this build.
+        /// </summary>
+        private static void _getVersionInstances()
+        {
+            try
             {
-                Log.Warning($"PWProfiler is not enabled by config. It will not load.");
-                return;
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                using (Stream stream = assembly.GetManifestResourceStream("PWProfiler.version.txt"))
+                using (StreamReader reader = new StreamReader(stream!))
+                {
+                    GitCommitHash = reader.ReadToEnd();
+                }
+
+                using (Stream stream = assembly.GetManifestResourceStream("PWProfiler.versionIdentifier.txt"))
+                using (StreamReader reader = new StreamReader(stream!))
+                    VersionIdentifier = reader.ReadToEnd();
+
             }
-            Singleton = this;
-            
-            // Plugin checks delta time so we need to convert the tps to a delta time.
-            Config.LowTps /= 1;
-            
-            // Start the NetDataIntegration
-            if (Config.NetDataIntegrationEnabled)
+            catch (Exception e)
             {
-                Log.Debug($"Starting Netdata Integration", Config.Debug);
-                var unused = new NetDataIntegration();
-            }
-            
-            // Start the Logging System
-            if (Config.FileLoggingEnabled)
-            {
-                Log.Debug($"Starting Logging System", Config.Debug);
-                var unused = new LoggingSystem();
-            }
-            
-            // Initializes the information to track cpu usage.
-            if (Config.CheckCpu)
-            {
-                Log.Debug($"Initializing Cpu Stats", Config.Debug);
-                _initCpuInfo();
+                Log.Error(e.ToString());
             }
 
-            Timing.CallDelayed(5f, () =>
-            {
-
-                // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
-                Log.Debug($"Creating Timing MonoBehaviour", Config.Debug);
-                TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ?? LiteNetLib4MirrorNetworkManager
-                    .singleton.gameObject.AddComponent<TimingMonoBehaviour>();
-
-                // Starts the main coroutine for checking stats.
-                Log.Debug($"Beginning Performance Measuring Coroutine", Config.Debug);
-                Timing.RunCoroutine(PerformanceMeasuringCoroutine());
-            });
         }
         
+        /// <summary>
+        /// The shortened hash of the commit
+        /// </summary>
+        public static string GitCommitHash = String.Empty;
         
+        /// <summary>
+        /// The build method of this build.
+        /// </summary>
+        public static string VersionIdentifier = String.Empty;
+
 
         /// <summary>
         /// Initializes the information to track cpu usage.

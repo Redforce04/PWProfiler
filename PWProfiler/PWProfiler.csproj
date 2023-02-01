@@ -220,12 +220,12 @@
     </ItemGroup>
     <ItemGroup>
       <EmbeddedResource Include="version.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
       <EmbeddedResource Include="versionIdentifier.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>

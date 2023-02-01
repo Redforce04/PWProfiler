@@ -100,8 +100,8 @@
       # where it is located (e.g. 'dotnet build ./src/ConsoleApp').
       # Only one project path can be passed as a parameter to 'dotnet build' command.
       script: 
-      - 'echo ${CI_COMMIT_SHORT_SHA}'
       - 'echo ${CI_COMMIT_SHORT_SHA} > PWProfiler/version.txt'
+      - 'cat NetDataSL/version.txt'
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
       #- 'mkdir dependencies'

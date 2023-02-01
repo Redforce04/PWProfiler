@@ -3,6 +3,6 @@
   <Costura>
     <IncludeAssemblies>
             Newtonsoft.Json
-        </IncludeAssemblies>
+    </IncludeAssemblies>
   </Costura>
 </Weavers>

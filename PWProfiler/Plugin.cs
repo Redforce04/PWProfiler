@@ -10,7 +10,6 @@ using MEC;
 using Mirror.LiteNetLib4Mirror;
 using PWProfiler.Configs;
 using PWProfiler.Structs;
-using Sentry;
 using Object = UnityEngine.Object;
 
 namespace PWProfiler
@@ -63,24 +62,10 @@ namespace PWProfiler
         void LoadPlugin()
         {
             _getVersionInstances();
-
-            using (SentrySdk.Init(o =>
-                   {
-                       o.Dsn = "https://d274762b2b284900950ef5a34344d503@sentry.peanutworshipers.net/3";
-                       // When configuring for the first time, to see what the SDK is doing:
-                       o.Debug = true;
-                       o.Release = GitCommitHash;
-                       o.AutoSessionTracking = true;
-                       // Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
-                       // We recommend adjusting this value in production.
-                       o.TracesSampleRate = 1.0;
-                       // Enable Global Mode if running in a client app
-                       o.IsGlobalModeEnabled = true;
-                   }))
-            {
+            
                 // App code goes here. Dispose the SDK before exiting to flush events.
 
-                Log.Info($"PWProfiler Loading.");
+                Log.Info($"PWProfiler Loading ({GitCommitHash}).");
                 if (Config is null)
                 {
                     var handler = PluginHandler.Get(this);
@@ -92,6 +77,7 @@ namespace PWProfiler
                     Log.Warning($"PWProfiler is not enabled by config. It will not load.");
                     return;
                 }
+                CosturaUtility.Initialize();
 
                 Singleton = this;
                 // Plugin checks delta time so we need to convert the tps to a delta time.
@@ -131,7 +117,6 @@ namespace PWProfiler
                     Log.Debug($"Beginning Performance Measuring Coroutine", Config.Debug);
                     Timing.RunCoroutine(PerformanceMeasuringCoroutine());
                 });
-            }
         }
 
         /// <summary>

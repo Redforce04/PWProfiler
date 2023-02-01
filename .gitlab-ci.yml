@@ -103,12 +103,12 @@
       - 'echo ${CI_COMMIT_SHORT_SHA} > PWProfiler/version.txt'
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
-      - 'mkdir dependencies'
-      - 'mv packages/Newtonsoft.Json.13.0.2/lib/netstandard2.0/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
+      #- 'mkdir dependencies'
+      #- 'mv packages/Newtonsoft.Json.13.0.2/lib/netstandard2.0/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
       artifacts:
         name: "Build Results"
         paths: 
           - PWProfiler.dll
-          - dependencies/Newtonsoft.Json.dll
+          #- dependencies/Newtonsoft.Json.dll
       
     

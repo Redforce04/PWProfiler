@@ -65,7 +65,7 @@ namespace PWProfiler
             
                 // App code goes here. Dispose the SDK before exiting to flush events.
 
-                Log.Info($"PWProfiler Loading ({GitCommitHash}).");
+                Log.Info($"PWProfiler Loading ({GitCommitHash}, {VersionIdentifier}).");
                 if (Config is null)
                 {
                     var handler = PluginHandler.Get(this);

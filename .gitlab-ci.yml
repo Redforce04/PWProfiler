@@ -87,6 +87,10 @@
     #
     # Learn more about GitLab cache: https://docs.gitlab.com/ee/ci/caching/index.html
     before_script:
+      - 'echo ${CI_COMMIT_SHORT_SHA} > PWProfiler/version.txt'
+      - 'echo ${CI_COMMIT_BRANCH} > PWProfiler/versionIndentifier.txt'
+      - 'cat PWProfiler/version.txt'
+      - 'cat PWProfiler/versionIdentifier.txt'
       - 'dotnet restore --packages $NUGET_PACKAGES_DIRECTORY'
     
     build:
@@ -100,8 +104,6 @@
       # where it is located (e.g. 'dotnet build ./src/ConsoleApp').
       # Only one project path can be passed as a parameter to 'dotnet build' command.
       script: 
-      - 'echo ${CI_COMMIT_SHORT_SHA} > PWProfiler/version.txt'
-      - 'cat PWProfiler/version.txt'
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
       #- 'mkdir dependencies'

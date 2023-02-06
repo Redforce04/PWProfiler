@@ -88,6 +88,8 @@
     # Learn more about GitLab cache: https://docs.gitlab.com/ee/ci/caching/index.html
     before_script:
       - 'envsubst < PWProfiler/AssemblyInfo.cs | sponge PWProfiler/AssemblyInfo.cs'
+      - 'ls'
+      - 'ls PWProfiler'
       - 'dotnet restore --packages $NUGET_PACKAGES_DIRECTORY'
       - 'cat PWProfiler/AssemblyInfo.cs'
     

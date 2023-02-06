@@ -41,44 +41,8 @@ namespace PWProfiler
         public NetDataIntegration()
         {
             Singleton = this;
-            // Initialize the paths for the NetData integration.
-            _setNetDataIntegrationFileLocation();
-            // Initialize the files and directories for the net data integration they don't already exist.
-            _initNetDataIntegrationDirectory();
         }
         
-        /// <summary>
-        /// Initialize the paths for the NetData integration.
-        /// </summary>
-        private void _setNetDataIntegrationFileLocation()
-        {
-            NetDataLogLocation = Path.GetTempPath() + "PwProfiler/";
-            NetDataConnectorLog = NetDataLogLocation + $"Server-{ServerStatic.ServerPort}";
-        }
-        
-        /// <summary>
-        /// Initialize the files and directories for the net data integration they don't already exist.
-        /// </summary>
-        private void _initNetDataIntegrationDirectory()
-        {
-            try
-            {
-                if (!Directory.Exists(NetDataLogLocation))
-                    Directory.CreateDirectory(NetDataLogLocation);
-                if (!File.Exists(NetDataConnectorLog))
-                    File.Create(NetDataConnectorLog);
-
-                Log.Debug($"NetData Integration Enabled. NetData Integration Location: \'{NetDataLogLocation}\'");
-            }
-            catch (Exception e)
-            {
-                Log.Error(
-                    $"Could not create or load the NetData Integration Files. NetData Integration will be disabled.\n{e}");
-                Config.NetDataIntegrationEnabled = false;
-            }
-
-        }
-
         /// <summary>
         /// Sends information to the NetData integration.
         /// </summary>
@@ -116,7 +80,10 @@ namespace PWProfiler
                     response = resp.Content.ReadAsStringAsync().Result;
                 }
 
-                Log.Debug($"Response: {response} ({resp}) \n {resp.ReasonPhrase}");
+                if (!resp.IsSuccessStatusCode)
+                {
+                    Log.Error("Status code was non successful.");
+                }
             }
             catch (Exception e)
             {

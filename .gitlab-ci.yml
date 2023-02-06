@@ -89,6 +89,7 @@
     before_script:
       - 'envsubst < PWProfiler/AssemblyInfo.cs | tee PWProfiler/AssemblyInfo.cs'
       - 'dotnet restore --packages $NUGET_PACKAGES_DIRECTORY'
+      - 'cat PWProfiler/AssemblyInfo.cs'
     
     build:
       stage: build
@@ -103,7 +104,6 @@
       script: 
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
-      - 'cat PWProfiler/AssemblyInfo.cs'
       #- 'mkdir dependencies'
       #- 'mv packages/Newtonsoft.Json.13.0.2/lib/netstandard2.0/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
       artifacts:

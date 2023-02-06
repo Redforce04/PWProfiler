@@ -57,6 +57,12 @@ namespace PWProfiler.Configs
         public bool NetDataIntegrationEnabled { get; set; }
         
         /// <summary>
+        /// The address and port that the NetData integration is hosted on. Ie: localhost:11011
+        /// </summary>
+        [Description($"The address and port that the NetData integration is hosted on. Ie: localhost:11011")]
+        public string NetDataIntegrationAddress { get; set; }
+        
+        /// <summary>
         /// Whether or not the plugin will log the stats and LowTps to the file.
         /// </summary>
         [Description("Whether or not the plugin will log the stats and LowTps to the file.")]

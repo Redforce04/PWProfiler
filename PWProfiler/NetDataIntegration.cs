@@ -9,11 +9,12 @@
 
 using System;
 using System.IO;
-using System.Text;
+using System.Net.Http;
 using Newtonsoft.Json;
 using PluginAPI.Core;
 using PWProfiler.Configs;
 using PWProfiler.Structs;
+using NetDataPacket = PWProfiler.Structs.NetDataPacket;
 
 namespace PWProfiler
 {
@@ -77,7 +78,7 @@ namespace PWProfiler
             }
 
         }
-        
+
         /// <summary>
         /// Sends information to the NetData integration.
         /// </summary>
@@ -85,12 +86,13 @@ namespace PWProfiler
         /// <param name="lowTps"></param>
         internal void SendInfoToNetDataIntegration(LoggingInfo log, int lowTps)
         {
+
             NetDataPacket packet = new NetDataPacket()
             {
                 Port = Server.Port,
                 ServerName = Config.ServerName,
                 RefreshSpeed = Config.StatsRefreshTime,
-                Epoch = log.Epoch,
+                Epoch = (long)log.Epoch,
                 AverageTps = log.AverageTps,
                 AverageDeltaTime = log.AverageDeltaTime,
                 CpuUsage = log.CpuUsage,
@@ -98,14 +100,37 @@ namespace PWProfiler
                 Players = log.Players,
                 LowTpsWarnCount = lowTps
             };
-            LastPacket = packet;
             string json = JsonConvert.SerializeObject(packet);
-            using (FileStream fs = new FileStream(NetDataConnectorLog, FileMode.Append, FileAccess.Write, FileShare.Write))
+            LastPacket = packet;
+            HttpResponseMessage resp = null;
+            string response = string.Empty;
+            try
             {
-                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-                sw.Write(json);
-                sw.Close();
-                fs.Close();
+
+                using (HttpClient client = new HttpClient())
+                {
+                    //client.DefaultRequestHeaders.Add("ApiKey", Add api key here);
+                    HttpContent content = new StringContent(json);
+                    resp = client.PostAsync("http://" + NetDataIntegration.Config.NetDataIntegrationAddress + "/packet",
+                        content).Result;
+                    response = resp.Content.ReadAsStringAsync().Result;
+                }
+
+                Log.Debug($"Response: {response} ({resp}) \n {resp.ReasonPhrase}");
+            }
+            catch (Exception e)
+            {
+                if (e is AggregateException)
+                {
+                    Log.Error(
+                        $"An error has occured while trying to send data to the server. Check that it is running properly.");
+                    Log.Debug($"{e}", Config.Debug);
+                }
+                else
+                {
+                    Log.Error($"An error has occured while trying to send data. ");
+
+                }
             }
         }
     }

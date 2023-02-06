@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Security.Cryptography;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using MEC;
@@ -126,17 +125,8 @@ namespace PWProfiler
         {
             try
             {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                using (Stream stream = assembly.GetManifestResourceStream("PWProfiler.version.txt"))
-                using (StreamReader reader = new StreamReader(stream!))
-                {
-                    GitCommitHash = reader.ReadToEnd();
-                }
-
-                using (Stream stream = assembly.GetManifestResourceStream("PWProfiler.versionIdentifier.txt"))
-                using (StreamReader reader = new StreamReader(stream!))
-                    VersionIdentifier = reader.ReadToEnd();
-
+                GitCommitHash = AssemblyInfo.CommitHash;
+                VersionIdentifier = AssemblyInfo.CommitBranch;
             }
             catch (Exception e)
             {
@@ -199,19 +189,19 @@ namespace PWProfiler
         private void _logStats()
         {
             // Check memory usage if enabled.
-            long allocatedMemory  = Config.CheckMemory ? _currentProcess.WorkingSet64 : -1;
+            long allocatedMemory  = Config.CheckMemory ? _currentProcess.WorkingSet64 : 0;
             
             // Check CPU Usage if enabled.
-            float cpuUsage = Config.CheckCpu ? _cpuCounter.NextValue() : -1;
+            float cpuUsage = Config.CheckCpu ? _cpuCounter.NextValue() : 0;
             
             // Create the struct object.
             LoggingInfo loggingInfo = new LoggingInfo()
             {
                 DateTime = DateTime.UtcNow,
-                Epoch = Epoch,
+                Epoch = (ulong)Epoch,
                 AverageTps = 1/TimingMonoBehaviour.AverageDeltaTime,
                 AverageDeltaTime = TimingMonoBehaviour.AverageDeltaTime,
-                MemoryUsage = allocatedMemory/1000000,
+                MemoryUsage = (ulong)allocatedMemory/1000000,
                 CpuUsage = cpuUsage,
                 Players = Server.PlayerCount
             };

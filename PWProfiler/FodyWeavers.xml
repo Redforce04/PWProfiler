@@ -2,7 +2,14 @@
 <Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
   <Costura>
     <IncludeAssemblies>
-            Newtonsoft.Json
+        Newtonsoft.Json
+        Google.Protobuf
+        Grpc.Core.Api
+        Grpc.Net.Client
+        Grpc.Net.Client.Web
+        Grpc.Net.Common
+        Microsoft.Extensions.Logging.Abstractions
+        System.Diagnostics.DiagnosticSource
     </IncludeAssemblies>
   </Costura>
 </Weavers>

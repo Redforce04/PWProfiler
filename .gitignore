@@ -4,6 +4,10 @@
 
 PWProfiler/bin/*
 PWProfiler/bin/
+PWProfiler/obj/Debug/
+PWProfiler/obj/Debug/*
+PWProfiler/bin/Release/
+PWProfiler/bin/Release/*
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml

@@ -37,7 +37,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
-          <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Assembly-CSharp-Publicized.dll</HintPath>
+          <HintPath>..\References\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
           <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Assembly-CSharp-firstpass.dll</HintPath>
@@ -80,7 +80,7 @@
           <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
         </Reference>
         <Reference Include="Mirror">
-          <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Mirror-Publicized.dll</HintPath>
+          <HintPath>..\References\Mirror-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib" />
         <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

@@ -267,6 +267,14 @@
       </Content>
       <Content Include="FodyWeavers.xml" />
     </ItemGroup>
+    <ItemGroup Condition="'$(OS)' != 'Windows_NT' AND '$(TargetFramework.TrimEnd(`0123456789`))'== 'net'">
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all">
+        </PackageReference>
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(OS)' != 'Windows_NT' AND '$(TargetFramework.TrimEnd(`0123456789`))'== 'net'">
+        <FrameworkPathOverride>$(NuGetPackageRoot)microsoft.netframework.referenceassemblies.net472/1.0.2/build/.NETFramework/v4.7.2/</FrameworkPathOverride>
+    </PropertyGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

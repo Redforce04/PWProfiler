@@ -101,9 +101,9 @@
       # where it is located (e.g. 'dotnet build ./src/ConsoleApp').
       # Only one project path can be passed as a parameter to 'dotnet build' command.
       script: 
-      - 'dotnet build'
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
+      - 'cat PWProfiler/AssemblyInfo.cs'
       #- 'mkdir dependencies'
       #- 'mv packages/Newtonsoft.Json.13.0.2/lib/netstandard2.0/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
       artifacts:

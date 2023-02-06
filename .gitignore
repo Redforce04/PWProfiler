@@ -4,13 +4,7 @@
 
 PWProfiler/bin/*
 PWProfiler/bin/
-PWProfiler/obj/*
-PWProfiler/obj/
-PWProfiler\bin\*
-PWProfiler\bin\
-PWProfiler\obj\*
-PWProfiler\obj\
-# User-specific stuff
+\# User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml

@@ -20,7 +20,6 @@
     image: redforce04/discordbot:netdataslbuilder
     stages:
       - build
-      - deploy
     
     # ### Define variables
     #
@@ -88,8 +87,6 @@
     # Learn more about GitLab cache: https://docs.gitlab.com/ee/ci/caching/index.html
     before_script:
       - 'dotnet restore --packages $NUGET_PACKAGES_DIRECTORY'
-      - 'envsubst < PWProfiler/AssemblyInfo.cs | sponge PWProfiler/AssemblyInfo.cs'
-      - 'cat PWProfiler/AssemblyInfo.cs'
     
     build:
       stage: build
@@ -102,6 +99,7 @@
       # where it is located (e.g. 'dotnet build ./src/ConsoleApp').
       # Only one project path can be passed as a parameter to 'dotnet build' command.
       script: 
+      - 'envsubst < PWProfiler/AssemblyInfo.cs | sponge PWProfiler/AssemblyInfo.cs'
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
       #- 'mkdir dependencies'
@@ -110,7 +108,4 @@
         name: "Build Results"
         paths: 
           - PWProfiler.dll
-          - PWProfiler
           #- dependencies/Newtonsoft.Json.dll
-      
-    

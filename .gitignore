@@ -2,7 +2,9 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 
+/PWProfiler/bin/*
 /PWProfiler/bin/
+/PWProfiler/obj/*
 /PWProfiler/obj/
 # User-specific stuff
 .idea/**/workspace.xml
@@ -10,7 +12,8 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-
+.vs/*
+.vs/
 # AWS User-specific
 .idea/**/aws.xml
 

@@ -23,6 +23,7 @@ namespace PWProfiler
         /// </summary>
         public static PWProfiler Singleton { get; private set; }
 
+        public const string ApiVersion = "1.1.2";
         /// <summary>
         /// Main Plugin Config
         /// </summary>

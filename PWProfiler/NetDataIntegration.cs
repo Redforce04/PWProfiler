@@ -62,7 +62,10 @@ namespace PWProfiler
                 CpuUsage = log.CpuUsage,
                 MemoryUsage = log.MemoryUsage,
                 Players = log.Players,
-                LowTpsWarnCount = lowTps
+                LowTpsWarnCount = lowTps,
+                ApiVersion = PWProfiler.ApiVersion,
+                PluginVersion = $"{AssemblyInfo.CommitHash}-{AssemblyInfo.CommitBranch}",
+                ApiKey = Config.ApiKey
             };
             string json = JsonConvert.SerializeObject(packet);
             LastPacket = packet;

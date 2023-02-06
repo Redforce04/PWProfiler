@@ -43,7 +43,7 @@
           <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
         <Reference Include="CommandSystem.Core">
-          <HintPath>..\..\..\OneDrive\Documents\SCP Plugin\Managed\CommandSystem.Core.dll</HintPath>
+          <HintPath>..\References\CommandSystem.Core.dll</HintPath>
         </Reference>
         <Reference Include="Costura, Version=5.8.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
           <HintPath>..\packages\Costura.Fody.5.8.0-alpha0098\lib\netstandard1.0\Costura.dll</HintPath>
@@ -221,6 +221,7 @@
     <ItemGroup>
         <Compile Include="AssemblyInfo.cs" />
         <Compile Include="Commands\LastProfileCommand.cs" />
+        <Compile Include="Commands\RegisterServer.cs" />
         <Compile Include="Commands\TpsCommand.cs" />
         <Compile Include="Configs\Config.cs" />
         <Compile Include="Enums\LoggingFile.cs" />
@@ -232,6 +233,7 @@
         <Compile Include="Structs\LoggingInfo.cs" />
         <Compile Include="Structs\LowTps.cs" />
         <Compile Include="Structs\NetDataPacket.cs" />
+        <Compile Include="Structs\ServerConfig.cs" />
         <Compile Include="TimingMonoBehaviour.cs" />
     </ItemGroup>
     <ItemGroup>

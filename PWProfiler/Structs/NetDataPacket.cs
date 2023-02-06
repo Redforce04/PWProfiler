@@ -21,5 +21,9 @@ namespace PWProfiler.Structs
         public float CpuUsage;
         public int Players;
         public int LowTpsWarnCount;
+        public string ApiKey;
+        public string ApiVersion;
+        public string PluginVersion;
+        
     }
 }

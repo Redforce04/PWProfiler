@@ -86,6 +86,12 @@ namespace PWProfiler.Configs
         /// </summary>
         [Description("The name of the server to show up in netdata.")]
         public string ServerName { get; set; } = "Server";
+        
+        /// <summary>
+        /// Used to communicate with the NetData integration and verify that this is a registered server with permission to update stats.
+        /// </summary>
+        [Description("Used to communicate with the NetData integration and verify that this is a registered server with permission to update stats.")]
+        public string ApiKey { get; set; }
 
     }
 }

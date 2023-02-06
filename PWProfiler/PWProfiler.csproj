@@ -4854,6 +4854,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all">
         </PackageReference>
+        <PackageReference Include="package.mscorlib" Version="1.0.1" />
     </ItemGroup>
 
     <PropertyGroup>

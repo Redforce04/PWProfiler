@@ -110,7 +110,7 @@
         name: "Build Results"
         paths: 
           - PWProfiler.dll
-          - *
+          - PWProfiler
           #- dependencies/Newtonsoft.Json.dll
       
     

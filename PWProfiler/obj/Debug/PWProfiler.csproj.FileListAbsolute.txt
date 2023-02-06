@@ -123,7 +123,6 @@ C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.XRModul
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\UnityEngine.InputModule.dll
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\PWProfiler.dll.config
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Newtonsoft.Json.xml
-C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\obj\Debug\Sentry.Attributes.cs
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\version.txt
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\versionIdentifier.txt
 C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
@@ -288,3 +287,30 @@ C:\Users\AJ Blessing\RiderProjects\PWProfiler\PWProfiler\obj\Debug\PWProfiler.cs
 C:\Users\AJ Blessing\RiderProjects\PWProfiler\PWProfiler\obj\Debug\PWProfiler.dll
 C:\Users\AJ Blessing\RiderProjects\PWProfiler\PWProfiler\obj\Debug\PWProfiler.pdb
 C:\Users\AJ Blessing\RiderProjects\PWProfiler\PWProfiler\bin\Debug\CommandSystem.Core.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\Microsoft.Win32.Primitives.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.AppContext.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Console.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Core.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Diagnostics.Tracing.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Globalization.Calendars.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.IO.Compression.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.IO.Compression.ZipFile.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.IO.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.IO.FileSystem.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.IO.FileSystem.Primitives.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Linq.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Linq.Expressions.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Net.Http.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Net.Sockets.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Reflection.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Runtime.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Runtime.Extensions.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Runtime.InteropServices.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Security.Cryptography.Algorithms.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Security.Cryptography.Encoding.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Security.Cryptography.Primitives.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Security.Cryptography.X509Certificates.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Text.RegularExpressions.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Xml.Linq.dll
+C:\Users\redfo\RiderProjects\PWProfiler\PWProfiler\bin\Debug\System.Xml.ReaderWriter.dll

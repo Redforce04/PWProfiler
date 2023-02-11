@@ -14,10 +14,10 @@ namespace PWProfiler.Structs
     public struct LoggingInfo
     {
         internal DateTime DateTime;
-        internal long Epoch;
+        internal ulong Epoch;
         internal float AverageTps;
         internal float AverageDeltaTime;
-        internal long MemoryUsage;
+        internal ulong MemoryUsage;
         internal float CpuUsage;
         internal int Players;
     }

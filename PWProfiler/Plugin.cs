@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using MEC;
@@ -21,6 +23,7 @@ namespace PWProfiler
         /// </summary>
         public static PWProfiler Singleton { get; private set; }
 
+        public const string ApiVersion = "1.1.2";
         /// <summary>
         /// Main Plugin Config
         /// </summary>
@@ -58,58 +61,91 @@ namespace PWProfiler
         // ReSharper disable once UnusedMember.Local
         void LoadPlugin()
         {
-            Log.Info($"PWProfiler Loading.");
-            if (Config is null)
-            {
-                var handler = PluginHandler.Get(this);
-                handler.LoadConfig(this,nameof(MainConfig));
-            }
-            if (Config == null || !Config.Enabled)
-            {
-                Log.Warning($"PWProfiler is not enabled by config. It will not load.");
-                return;
-            }
-            Singleton = this;
+            _getVersionInstances();
             
-            // Plugin checks delta time so we need to convert the tps to a delta time.
-            Config.LowTps /= 1;
-            
-            // Start the NetDataIntegration
-            if (Config.NetDataIntegrationEnabled)
+                // App code goes here. Dispose the SDK before exiting to flush events.
+
+                Log.Info($"PWProfiler Loading ({GitCommitHash}, {VersionIdentifier}).");
+                if (Config is null)
+                {
+                    var handler = PluginHandler.Get(this);
+                    handler.LoadConfig(this, nameof(MainConfig));
+                }
+
+                if (Config == null || !Config.Enabled)
+                {
+                    Log.Warning($"PWProfiler is not enabled by config. It will not load.");
+                    return;
+                }
+                CosturaUtility.Initialize();
+
+                Singleton = this;
+                // Plugin checks delta time so we need to convert the tps to a delta time.
+                Config.LowTps /= 1;
+
+                // Start the NetDataIntegration
+                if (Config.NetDataIntegrationEnabled)
+                {
+                    Log.Debug($"Starting Netdata Integration", Config.Debug);
+                    var unused = new NetDataIntegration();
+                }
+
+                // Start the Logging System
+                if (Config.FileLoggingEnabled)
+                {
+                    Log.Debug($"Starting Logging System", Config.Debug);
+                    var unused = new LoggingSystem();
+                }
+
+                // Initializes the information to track cpu usage.
+                if (Config.CheckCpu)
+                {
+                    Log.Debug($"Initializing Cpu Stats", Config.Debug);
+                    _initCpuInfo();
+                }
+
+                Timing.CallDelayed(5f, () =>
+                {
+
+                    // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
+                    Log.Debug($"Creating Timing MonoBehaviour", Config.Debug);
+                    TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ??
+                                          LiteNetLib4MirrorNetworkManager
+                                              .singleton.gameObject.AddComponent<TimingMonoBehaviour>();
+
+                    // Starts the main coroutine for checking stats.
+                    Log.Debug($"Beginning Performance Measuring Coroutine", Config.Debug);
+                    Timing.RunCoroutine(PerformanceMeasuringCoroutine());
+                });
+        }
+
+        /// <summary>
+        /// Gets information about this build.
+        /// </summary>
+        private static void _getVersionInstances()
+        {
+            try
             {
-                Log.Debug($"Starting Netdata Integration", Config.Debug);
-                var unused = new NetDataIntegration();
+                GitCommitHash = AssemblyInfo.CommitHash;
+                VersionIdentifier = AssemblyInfo.CommitBranch;
             }
-            
-            // Start the Logging System
-            if (Config.FileLoggingEnabled)
+            catch (Exception e)
             {
-                Log.Debug($"Starting Logging System", Config.Debug);
-                var unused = new LoggingSystem();
-            }
-            
-            // Initializes the information to track cpu usage.
-            if (Config.CheckCpu)
-            {
-                Log.Debug($"Initializing Cpu Stats", Config.Debug);
-                _initCpuInfo();
+                Log.Error(e.ToString());
             }
 
-            Timing.CallDelayed(5f, () =>
-            {
-
-                // Creates the TimingMonoBehaviour by attaching the component to the network manager singleton.
-                Log.Debug($"Creating Timing MonoBehaviour", Config.Debug);
-                TimingMonoBehaviour = Object.FindObjectOfType<TimingMonoBehaviour>() ?? LiteNetLib4MirrorNetworkManager
-                    .singleton.gameObject.AddComponent<TimingMonoBehaviour>();
-
-                // Starts the main coroutine for checking stats.
-                Log.Debug($"Beginning Performance Measuring Coroutine", Config.Debug);
-                Timing.RunCoroutine(PerformanceMeasuringCoroutine());
-            });
         }
         
+        /// <summary>
+        /// The shortened hash of the commit
+        /// </summary>
+        public static string GitCommitHash = String.Empty;
         
+        /// <summary>
+        /// The build method of this build.
+        /// </summary>
+        public static string VersionIdentifier = String.Empty;
+
 
         /// <summary>
         /// Initializes the information to track cpu usage.
@@ -154,19 +190,19 @@ namespace PWProfiler
         private void _logStats()
         {
             // Check memory usage if enabled.
-            long allocatedMemory  = Config.CheckMemory ? _currentProcess.WorkingSet64 : -1;
+            long allocatedMemory  = Config.CheckMemory ? _currentProcess.WorkingSet64 : 0;
             
             // Check CPU Usage if enabled.
-            float cpuUsage = Config.CheckCpu ? _cpuCounter.NextValue() : -1;
+            float cpuUsage = Config.CheckCpu ? _cpuCounter.NextValue() : 0;
             
             // Create the struct object.
             LoggingInfo loggingInfo = new LoggingInfo()
             {
                 DateTime = DateTime.UtcNow,
-                Epoch = Epoch,
+                Epoch = (ulong)Epoch,
                 AverageTps = 1/TimingMonoBehaviour.AverageDeltaTime,
                 AverageDeltaTime = TimingMonoBehaviour.AverageDeltaTime,
-                MemoryUsage = allocatedMemory/1000000,
+                MemoryUsage = (ulong)allocatedMemory/1000000,
                 CpuUsage = cpuUsage,
                 Players = Server.PlayerCount
             };

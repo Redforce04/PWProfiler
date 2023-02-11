@@ -8,12 +8,12 @@
 // -----------------------------------------
 
 using System;
-using System.IO;
-using System.Text;
+using System.Net.Http;
 using Newtonsoft.Json;
 using PluginAPI.Core;
 using PWProfiler.Configs;
 using PWProfiler.Structs;
+using NetDataPacket = PWProfiler.Structs.NetDataPacket;
 
 namespace PWProfiler
 {
@@ -22,17 +22,9 @@ namespace PWProfiler
         public static NetDataIntegration Singleton;
         private static MainConfig Config => PWProfiler.Singleton.Config;
         
-        /// <summary>
-        /// The directory containing the NetData Integration connector file
-        /// </summary>
-        private string NetDataLogLocation { get; set; }
-
-        /// <summary>
-        /// The Path to the NetData Connector File.
-        /// </summary>
-        private string NetDataConnectorLog { get; set; }
-        
         internal NetDataPacket? LastPacket;
+
+        private DateTime? _lastError;
 
         /// <summary>
         /// 
@@ -40,44 +32,8 @@ namespace PWProfiler
         public NetDataIntegration()
         {
             Singleton = this;
-            // Initialize the paths for the NetData integration.
-            _setNetDataIntegrationFileLocation();
-            // Initialize the files and directories for the net data integration they don't already exist.
-            _initNetDataIntegrationDirectory();
         }
-        
-        /// <summary>
-        /// Initialize the paths for the NetData integration.
-        /// </summary>
-        private void _setNetDataIntegrationFileLocation()
-        {
-            NetDataLogLocation = Path.GetTempPath() + "PwProfiler/";
-            NetDataConnectorLog = NetDataLogLocation + $"Server-{ServerStatic.ServerPort}";
-        }
-        
-        /// <summary>
-        /// Initialize the files and directories for the net data integration they don't already exist.
-        /// </summary>
-        private void _initNetDataIntegrationDirectory()
-        {
-            try
-            {
-                if (!Directory.Exists(NetDataLogLocation))
-                    Directory.CreateDirectory(NetDataLogLocation);
-                if (!File.Exists(NetDataConnectorLog))
-                    File.Create(NetDataConnectorLog);
 
-                Log.Debug($"NetData Integration Enabled. NetData Integration Location: \'{NetDataLogLocation}\'");
-            }
-            catch (Exception e)
-            {
-                Log.Error(
-                    $"Could not create or load the NetData Integration Files. NetData Integration will be disabled.\n{e}");
-                Config.NetDataIntegrationEnabled = false;
-            }
-
-        }
-        
         /// <summary>
         /// Sends information to the NetData integration.
         /// </summary>
@@ -85,28 +41,54 @@ namespace PWProfiler
         /// <param name="lowTps"></param>
         internal void SendInfoToNetDataIntegration(LoggingInfo log, int lowTps)
         {
+
             NetDataPacket packet = new NetDataPacket()
             {
                 Port = Server.Port,
                 ServerName = Config.ServerName,
                 RefreshSpeed = Config.StatsRefreshTime,
-                Epoch = log.Epoch,
+                Epoch = (long)log.Epoch,
                 AverageTps = log.AverageTps,
                 AverageDeltaTime = log.AverageDeltaTime,
                 CpuUsage = log.CpuUsage,
                 MemoryUsage = log.MemoryUsage,
                 Players = log.Players,
-                LowTpsWarnCount = lowTps
+                LowTpsWarnCount = lowTps,
+                ApiVersion = PWProfiler.ApiVersion,
+                PluginVersion = $"{AssemblyInfo.CommitHash}-{AssemblyInfo.CommitBranch}",
+                ApiKey = Config.ApiKey
             };
-            LastPacket = packet;
             string json = JsonConvert.SerializeObject(packet);
-            using (FileStream fs = new FileStream(NetDataConnectorLog, FileMode.Append, FileAccess.Write, FileShare.Write))
+            LastPacket = packet;
+            try
             {
-                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-                sw.Write(json);
-                sw.Close();
-                fs.Close();
+                HttpResponseMessage resp;
+                string response;
+                using (HttpClient client = new HttpClient())
+                {
+                    //client.DefaultRequestHeaders.Add("ApiKey", Add api key here);
+                    HttpContent content = new StringContent(json);
+                    resp = client.PostAsync("http://" + NetDataIntegration.Config.NetDataIntegrationAddress + "/packet",
+                        content).Result;
+                    response = resp.Content.ReadAsStringAsync().Result;
+                }
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    Log.Error($"Status code was non successful. {response}");
+                }
             }
+            catch (Exception e)
+            {
+                if (_lastError is null || !_lastError.HasValue && _lastError!.Value.AddMinutes(15) < DateTime.UtcNow)
+                {
+                    _lastError = DateTime.UtcNow;
+                    Log.Error($"An error has occured while trying to send data to the server. Check that it is running properly.");
+                }
+
+                Log.Debug($"{e}", Config.Debug);
+            }
+
         }
     }
 }

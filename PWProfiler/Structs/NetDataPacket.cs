@@ -9,17 +9,21 @@
 
 namespace PWProfiler.Structs
 {
-    internal struct NetDataPacket
+    public struct NetDataPacket
     {
-        internal int Port;
-        internal string ServerName;
-        internal float RefreshSpeed;
-        internal long Epoch;
-        internal float AverageTps;
-        internal float AverageDeltaTime;
-        internal long MemoryUsage;
-        internal float CpuUsage;
-        internal int Players;
-        internal int LowTpsWarnCount;
+        public int Port;
+        public string ServerName;
+        public float RefreshSpeed;
+        public long Epoch;
+        public float AverageTps;
+        public float AverageDeltaTime;
+        public ulong MemoryUsage;
+        public float CpuUsage;
+        public int Players;
+        public int LowTpsWarnCount;
+        public string ApiKey;
+        public string ApiVersion;
+        public string PluginVersion;
+        
     }
 }

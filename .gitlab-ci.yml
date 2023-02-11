@@ -20,7 +20,6 @@
     image: redforce04/discordbot:netdataslbuilder
     stages:
       - build
-      - deploy
     
     # ### Define variables
     #
@@ -31,7 +30,7 @@
       NUGET_PACKAGES_DIRECTORY: '.nuget'
       # 3) A relative path to the source code from project repository root.
       # NOTE: Please edit this path so it matches the structure of your project!
-      SOURCE_CODE_PATH: '*/'
+      SOURCE_CODE_PATH: 'PWProfiler/'
     
     # ### Define global cache rule
     #
@@ -100,14 +99,13 @@
       # where it is located (e.g. 'dotnet build ./src/ConsoleApp').
       # Only one project path can be passed as a parameter to 'dotnet build' command.
       script: 
+      - 'envsubst < PWProfiler/AssemblyInfo.cs | sponge PWProfiler/AssemblyInfo.cs'
       - 'dotnet publish -c Release --no-restore'
       - 'mv PWProfiler/bin/Debug/PWProfiler.dll PWProfiler.dll'
-      - 'mkdir dependencies'
-      - 'mv packages/Newtonsoft.Json.13.0.2/lib/netstandard2.0/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
+      #- 'mkdir dependencies'
+      #- 'mv packages/Newtonsoft.Json.13.0.2/lib/netstandard2.0/Newtonsoft.Json.dll dependencies/Newtonsoft.Json.dll'
       artifacts:
         name: "Build Results"
         paths: 
           - PWProfiler.dll
-          - dependencies/Newtonsoft.Json.dll
-      
-    
+          #- dependencies/Newtonsoft.Json.dll

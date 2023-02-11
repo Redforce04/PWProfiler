@@ -8,7 +8,6 @@
 // -----------------------------------------
 
 using System;
-using System.IO;
 using System.Net.Http;
 using Newtonsoft.Json;
 using PluginAPI.Core;
@@ -23,17 +22,9 @@ namespace PWProfiler
         public static NetDataIntegration Singleton;
         private static MainConfig Config => PWProfiler.Singleton.Config;
         
-        /// <summary>
-        /// The directory containing the NetData Integration connector file
-        /// </summary>
-        private string NetDataLogLocation { get; set; }
-
-        /// <summary>
-        /// The Path to the NetData Connector File.
-        /// </summary>
-        private string NetDataConnectorLog { get; set; }
-        
         internal NetDataPacket? LastPacket;
+
+        private DateTime? _lastError;
 
         /// <summary>
         /// 
@@ -42,7 +33,7 @@ namespace PWProfiler
         {
             Singleton = this;
         }
-        
+
         /// <summary>
         /// Sends information to the NetData integration.
         /// </summary>
@@ -69,11 +60,10 @@ namespace PWProfiler
             };
             string json = JsonConvert.SerializeObject(packet);
             LastPacket = packet;
-            HttpResponseMessage resp = null;
-            string response = string.Empty;
             try
             {
-
+                HttpResponseMessage resp;
+                string response;
                 using (HttpClient client = new HttpClient())
                 {
                     //client.DefaultRequestHeaders.Add("ApiKey", Add api key here);
@@ -85,23 +75,20 @@ namespace PWProfiler
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    Log.Error("Status code was non successful.");
+                    Log.Error($"Status code was non successful. {response}");
                 }
             }
             catch (Exception e)
             {
-                if (e is AggregateException)
+                if (_lastError is null || !_lastError.HasValue && _lastError!.Value.AddMinutes(15) < DateTime.UtcNow)
                 {
-                    Log.Error(
-                        $"An error has occured while trying to send data to the server. Check that it is running properly.");
-                    Log.Debug($"{e}", Config.Debug);
+                    _lastError = DateTime.UtcNow;
+                    Log.Error($"An error has occured while trying to send data to the server. Check that it is running properly.");
                 }
-                else
-                {
-                    Log.Error($"An error has occured while trying to send data. ");
 
-                }
+                Log.Debug($"{e}", Config.Debug);
             }
+
         }
     }
 }

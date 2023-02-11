@@ -24,9 +24,11 @@ public struct ServerConfig
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerConfig"/> class.
     /// </summary>
-    [Newtonsoft.Json.JsonConstructor]
 
     // ReSharper disable InconsistentNaming
+    public ServerConfig()
+    {
+    }
     public ServerConfig(int Port, string ServerName, string Key)
     {
         this.Port = Port;
@@ -37,18 +39,15 @@ public struct ServerConfig
     /// <summary>
     /// Gets the port of the server.
     /// </summary>
-    [JsonPropertyName("Port")]
     public int Port { get; private set; }
 
     /// <summary>
     /// Gets the name of the server.
     /// </summary>
-    [JsonPropertyName("ServerName")]
     public string ServerName { get; private set; }
 
     /// <summary>
     /// Gets the key of the server.
     /// </summary>
-    [JsonPropertyName("Key")]
     public string Key { get; private set; }
 }

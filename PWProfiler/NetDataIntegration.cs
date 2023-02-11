@@ -1,4 +1,4 @@
-﻿// -----------------------------------------
+// -----------------------------------------
 //    Solution:         PWProfiler
 //    Project:          PWProfiler
 //    FileName:         NetDataIntegration.cs
@@ -75,7 +75,7 @@ namespace PWProfiler
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    Log.Error($"Status code was non successful. {response}");
+                    Log.Error($"Status code was non successful. {response} {resp.StatusCode}");
                 }
             }
             catch (Exception e)

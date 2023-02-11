@@ -1,8 +1,9 @@
 
 # PW Profiler
 
-An SCP-SL Server Profiler build on the Northwood Plugin-API.
+An SCP-SL Server Profiler build on the Northwood Plugin-API. An integration is available to report this to netdata, which can be found [here](https://git.peanutworshipers.net/redforce04/NetDataSL).
 <br/>
+
 
 ## Authors
 
@@ -31,15 +32,13 @@ An SCP-SL Server Profiler build on the Northwood Plugin-API.
 
 ## **Wip:**
 - Adding a feature to pull cpu and memory stats from docker api
-- **Netdata stat logging feature.**
-    - Adding the Netdata web api instead of a collector plugin 
 <br/>
 
 ## FAQ
 
 #### When will the netdata integration come out?
 
-Currently the plugin is having issues with how netdata parses plugin information. Because of this it may take a few days to get the integration to work as planned. 
+It is out now! It can be found [Here](https://git.peanutworshipers.net/redforce04/NetDataSL).
 
 #### I have a suggestion. How can I suggest it?
 

@@ -1,4 +1,4 @@
-// <copyright file="Log.cs" company="Redforce04#4091">
+﻿// <copyright file="Log.cs" company="Redforce04#4091">
 // Copyright (c) Redforce04. All rights reserved.
 // </copyright>
 // -----------------------------------------
@@ -14,6 +14,6 @@ namespace PWProfiler;
 
 public static class AssemblyInfo
 {
-    public const string CommitHash = "f7bb812";
-    public const string CommitBranch = "dev";
+    public const string CommitHash = "${CI_COMMIT_SHORT_SHA}";
+    public const string CommitBranch = "${CI_COMMIT_BRANCH}";
 }

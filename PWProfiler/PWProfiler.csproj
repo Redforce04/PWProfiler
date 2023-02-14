@@ -4861,6 +4861,11 @@
     <PropertyGroup>
         <FrameworkPathOverride>$(NuGetPackageRoot)microsoft.netframework.referenceassemblies.net472/1.0.2/build/.NETFramework/v4.7.2/</FrameworkPathOverride>
     </PropertyGroup>
+
+    <PropertyGroup>
+      <PreBuildEvent>copy ..\..\AssemblyInfoRestore.cs ..\..\AssemblyInfo.cs /Y &amp;&amp; ReplaceTextWithVariables -cmd "git rev-parse --abbrev-ref HEAD" "CI_COMMIT_BRANCH" -cmd "git rev-parse --short HEAD" "CI_COMMIT_SHORT_SHA" ..\..\AssemblyInfo.cs</PreBuildEvent>
+        <!--PreBuildEvent>copy AssemblyInfoRestore.cs AssemblyInfo.cs /Y  &amp;&amp; ReplaceTextWithVariables -cmd "git rev-parse -&-abbrev-ref HEAD" "CI_COMMIT_BRANCH" -cmd "git rev-parse -&-short HEAD" "CI_COMMIT_SHORT_SHA" AssemblyInfo.cs &amp;&amp; copy AssemblyInfoRestore.cs AssemblyInfo.cs /Y</PreBuildEvent-->
+    </PropertyGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

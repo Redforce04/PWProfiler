@@ -1,4 +1,4 @@
-﻿// -----------------------------------------
+// -----------------------------------------
 //    Solution:         PWProfiler
 //    Project:          PWProfiler
 //    FileName:         NetDataIntegration.cs

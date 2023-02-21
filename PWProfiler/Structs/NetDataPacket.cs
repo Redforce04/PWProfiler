@@ -15,6 +15,7 @@ namespace PWProfiler.Structs
         public string ServerName;
         public float RefreshSpeed;
         public long Epoch;
+        public long PreviousPacketEpoch;
         public float AverageTps;
         public float AverageDeltaTime;
         public ulong MemoryUsage;

@@ -34,7 +34,7 @@ namespace PWProfiler
         /// <summary>
         /// Gets the Epoch
         /// </summary>
-        private long Epoch => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        private long Epoch => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         
         /// <summary>
         /// The instance of TimingMonoBehaviour

@@ -8,6 +8,7 @@
 // -----------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
 using PluginAPI.Core;
@@ -26,12 +27,15 @@ namespace PWProfiler
 
         private DateTime? _lastError;
 
+        private DateTimeOffset _previousPacketTime;
+
         /// <summary>
         /// 
         /// </summary>
         public NetDataIntegration()
         {
             Singleton = this;
+            _previousPacketTime = DateTimeOffset.UtcNow;
         }
 
         /// <summary>
@@ -41,12 +45,12 @@ namespace PWProfiler
         /// <param name="lowTps"></param>
         internal void SendInfoToNetDataIntegration(LoggingInfo log, int lowTps)
         {
-
             NetDataPacket packet = new NetDataPacket()
             {
                 Port = Server.Port,
                 ServerName = Config.ServerName,
                 RefreshSpeed = Config.StatsRefreshTime,
+                PreviousPacketEpoch = _previousPacketTime.ToUnixTimeMilliseconds(),
                 Epoch = (long)log.Epoch,
                 AverageTps = log.AverageTps,
                 AverageDeltaTime = log.AverageDeltaTime,
@@ -76,6 +80,28 @@ namespace PWProfiler
                 if (!resp.IsSuccessStatusCode)
                 {
                     Log.Error($"Status code was non successful. {response} {resp.StatusCode}");
+                }
+                else
+                {
+                    _previousPacketTime = DateTimeOffset.UtcNow;
+                }
+
+                try
+                {
+                    var results = JsonConvert.DeserializeObject<Dictionary<string, object>>(response);
+                    if ((string)results["message"] == "slow refresh time")
+                    {
+                        float serverRefreshTime = (float)results["server refresh"];
+                        Log.Error($"Refresh time is slower than the server. " +
+                                  $"The refresh speed of the plugin will be set to the refresh time of the server." +
+                                  $" Update this variable in the plugin config to prevent the message. " +
+                                  $"(server refresh: {serverRefreshTime}, plugin refresh: {PWProfiler.Singleton.Config.StatsRefreshTime})");
+                        Config.StatsRefreshTime = serverRefreshTime;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Could not deserialize json response message. {e}");
                 }
             }
             catch (Exception e)
